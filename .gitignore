@@ -1,0 +1,4 @@
+*.jpg
+mnist_train_60000.txt
+mnist_train_1000.txt
+*.idx-ubyte
