@@ -1,3 +1,4 @@
+from imghdr import tests
 import math
 import random
 import numpy as np
@@ -14,16 +15,15 @@ class NeuralNetwork:
     layerList = []
     batchSize = 1.0 
     
-    def __init__(self, input, inputY=1):
-        self.inputSize = input
-        self.inputSizeT = inputY
+    def __init__(self, inputShape):
+        self.inputShape = inputShape
         
     def reinit(self):
         for i in self.layerList:
             i.reinit()
         
     def addDenseLayer(self, size, activationFunction=activationFunctions.tanh, activationFunctionD=activationFunctions.tanhD):
-        prevSize = self.inputSize
+        prevSize = self.inputShape[0]
         if(len(self.layerList) > 0):
             prevSize = self.layerList[len(self.layerList) - 1].outputShape[0]
         l = layer((prevSize, 1), (size, 1), activationFunction, activationFunctionD)
@@ -42,24 +42,27 @@ class NeuralNetwork:
         self.layerList.append(l)
         
     def guess(self, input):
-        inputMatrix = np.array(input, ndmin=2).T
+        inputMatrix = np.array(input, ndmin=2)
         
         outputMatrix = inputMatrix
         for it in range(len(self.layerList)):
             outputMatrix = self.layerList[it].forward(outputMatrix)
             
-        return outputMatrix.tolist()
+        return outputMatrix.T.tolist()
         
-    def train(self, inputSet, outputSet, epochs, mode=""):
+    def train(self, inputSet, outputSet, epochs, mode="", testSamples=10):
+        self.testSamples = testSamples
         iterations = 0
         for epoch in range(epochs):
             for k in range(len(inputSet)):
                 j = random.randrange(0, len(outputSet))
                 
+                outputTarget = np.zeros(self.inputShape)
+                inputMatrix = np.zeros(self.inputShape)
                 outputList = []
 
                 outputTarget = np.array(outputSet[j], ndmin=2).T
-                inputMatrix = np.array(inputSet[j], ndmin=2).T
+                inputMatrix = np.array(inputSet[j], ndmin=2)
                 
                 outputList.append(inputMatrix)
                 outputMatrix = inputMatrix
@@ -81,15 +84,21 @@ class NeuralNetwork:
                         pass
                         self.testClassifier(inputSet, outputSet)
             print("epoch:", epoch)
-            if(mode == "classifier"):
-                        self.testClassifier(inputSet, outputSet)
     
-    def testClassifier(self, trainingSet, trainingOutput):
-        t = max(1, math.floor(len(trainingSet)/100))
+    def testClassifier(self, trainingSet, trainingOutput, testSet=None, testOutput=None):
+        if testSet == None:
+            testSet = trainingSet
+            testOutput = trainingOutput
         count = 0
-        for i in range(t): 
+        for i in range(self.testSamples): 
             j = random.randrange(len(trainingSet) - 1)
-            if(np.argmax(self.guess(trainingSet[j])) == np.argmax(trainingOutput[j])):
+            if(np.argmax(self.guess(testSet[j])) == np.argmax(testOutput[j]).T):
                 count += 1
-        print(count*100/t, "% " + "over " + str(t) + (" tests"))
-    
+        print(count*100/self.testSamples, "% " + "over " + str(self.testSamples) + (" tests"))
+        self.dumpWeights()
+
+    def dumpWeights(self):
+        file = open("w/weights" + str(random.randrange(0,999999999)) + ".txt", "w")
+        for i in self.layerList:
+            with np.printoptions(threshold=np.inf):
+                file.write(str(i.weights))

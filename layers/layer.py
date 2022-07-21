@@ -14,7 +14,7 @@ class layer:
     learningRate = 0.1
     inputSize = 0
     
-    def __init__(self, inputShape, outputShape, activation=activationFunctions.tanh, activationD=activationFunctions.tanhD) -> None:
+    def __init__(self, inputShape, outputShape, activation=activationFunctions.sigmoid, activationD=activationFunctions.sigmoid) -> None:
         self.inputShape = inputShape
         self.outputShape = outputShape
         self.initWeights()

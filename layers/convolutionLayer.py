@@ -4,7 +4,7 @@ import activationFunctions
 import numpy as np
 
 class kernelLayer(layer):
-    def __init__(self, inputShape, kernelSize, kernelDepth, activation=activationFunctions.tanh, activationD=activationFunctions.tanhD, pad=0) -> None:
+    def __init__(self, inputShape, kernelSize, kernelDepth, activation=activationFunctions.sigmoid, activationD=activationFunctions.sigmoidD, pad=0) -> None:
         self.inputShape = inputShape #3 dimensions
         self.kernelSize = kernelSize
         self.kernelDepth = kernelDepth

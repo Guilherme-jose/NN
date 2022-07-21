@@ -7,7 +7,10 @@ class maxPoolLayer(layer):
         self.outputShape = outputShape
         inputDepth, inputHeight, inputWidth = inputShape
         self.inputDepth = inputDepth
+        self.inputHeight = inputHeight
+        self.inputWidth = inputWidth
         self.method = mode
+        self.kernelShape = (2,2); 
         
     def reinit(self) -> None:
         pass
@@ -15,15 +18,32 @@ class maxPoolLayer(layer):
     #takes input as matrix, for use inside the network
     def forward(self, input): #recheck later
         output = np.zeros(self.outputShape)
+        heightOffset = self.inputHeight%self.kernelShape[0]
+        widthOffset = self.inputWidth%self.kernelShape[1]
+        if heightOffset != 0 or widthOffset != 0:
+            input = np.pad(input, ((0,0),(0,heightOffset),(0,widthOffset)))
+            
         for i in range(self.inputDepth):
             output[i] = self.pool2D(input[i])
         return output
     
     def backPropagation(self, input, output, gradient):
+        heightOffset = self.inputHeight%self.kernelShape[0]
+        widthOffset = self.inputWidth%self.kernelShape[1]
         out = np.zeros(self.inputShape)
+        if heightOffset != 0 or widthOffset != 0:
+            out = np.pad(out, ((0,0),(0,heightOffset),(0,widthOffset)))
+        
         kMatrix = np.array(((0,0),(0,1)))
         for i in range(self.inputDepth):
             out[i] = np.kron(gradient[i], kMatrix)
+
+        for i in range(heightOffset): 
+            out = out[:,:-1, :]
+            
+        for i in range(widthOffset): 
+            out = out[:,:-1, :]
+        
         return out
     
     def pool2D(self, mat, ksize=(2,2), pad=False):
