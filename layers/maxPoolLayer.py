@@ -27,24 +27,30 @@ class maxPoolLayer(layer):
             output[i] = self.pool2D(input[i])
         return output
     
-    def backPropagation(self, input, output, gradient):
-        heightOffset = self.inputHeight%self.kernelShape[0]
-        widthOffset = self.inputWidth%self.kernelShape[1]
-        out = np.zeros(self.inputShape)
-        if heightOffset != 0 or widthOffset != 0:
-            out = np.pad(out, ((0,0),(0,heightOffset),(0,widthOffset)))
+    def backPropagation(self, input, output, gradient):#SLOOOOOOOW
+        C = self.inputDepth # number channels
+        H = self.inputHeight # height input
+        W = self.inputWidth # width input
+        pool_height = self.kernelShape[0]
+        pool_width = self.kernelShape[1]
+        stride = self.kernelShape[0]
         
-        kMatrix = np.array(((0,0),(0,1)))
-        for i in range(self.inputDepth):
-            out[i] = np.kron(gradient[i], kMatrix)
+        H_out = int(1 + (H - pool_height) / stride)
+        W_out = int(1 + (W - pool_width) / stride)
 
-        for i in range(heightOffset): 
-            out = out[:,:-1, :]
-            
-        for i in range(widthOffset): 
-            out = out[:,:-1, :]
+        dx = np.zeros_like(input)
         
-        return out
+        for c in range(C):
+            for i in range(H_out):
+                for j in range(W_out):
+                    # get the index in the region i,j where the value is the maximum
+                    i_t, j_t = np.where(np.max(input[c, i * stride : i * stride + pool_height, j * stride : j * stride + pool_width]) == input[c, i * stride : i * stride + pool_height, j * stride : j * stride + pool_width])
+                    i_t, j_t = i_t[0], j_t[0]
+                    # only the position of the maximum element in the region i,j gets the incoming gradient, the other gradients are zero
+                    dx[c, i * stride : i * stride + pool_height, j * stride : j * stride + pool_width][i_t, j_t] = gradient[c, i, j]
+
+        
+        return dx
     
     def pool2D(self, mat, ksize=(2,2), pad=False):
         m, n = mat.shape[:2]

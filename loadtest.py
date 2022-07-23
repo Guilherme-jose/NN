@@ -20,15 +20,15 @@ nn.addReshapeLayer((26,6,5), (780,1))
 nn.addDenseLayer(120, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 nn.addDenseLayer(84, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 nn.addDenseLayer(2, activationFunctions.sigmoid, activationFunctions.sigmoidD)
-
+        
 trainingSet = []
 trainingOutput = []
 testSet = []
 testOutput = []
 
 setSize = 3000
-
-for i in range(1,setSize):
+nn.loadWeights("cat4k")
+for i in range(4000, 5000):
     image = Image.open('training_set_small/cats/cat.' + str(i) + '.jpg')
     data = list(image.getdata())
     image.close()
@@ -44,27 +44,7 @@ for i in range(1,setSize):
     data = np.reshape(data, (1,75,70))
     trainingSet.append(data)
     trainingOutput.append([0,1])
-    
-for i in range(4000-setSize, 4000):
-    image = Image.open('training_set_small/cats/cat.' + str(i) + '.jpg')
-    data = list(image.getdata())
-    image.close()
-    data = np.reshape(data, (1,75,70))
-    data = [by255(i) for i in data]
-    testSet.append(data)
-    testOutput.append([1,0])
-    
-    image = Image.open('training_set_small/dogs/dog.' + str(i) + '.jpg')
-    data = list(image.getdata())
-    image.close()
-    data = np.reshape(data, 5250)
-    data = np.reshape(data, (1,75,70))
-    testSet.append(data)
-    testOutput.append([0,1])
-    
-print("training")
-
-nn.train(trainingSet,trainingOutput,10, "classifier", 1000, testSet, testOutput)
-    
+for i in range(100):
+    nn.testClassifier(trainingSet, trainingOutput, 1000)
 print("finished")
 

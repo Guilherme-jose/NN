@@ -9,11 +9,11 @@ class layer:
     def activationDerivative():
         pass
     
-    weights = []
-    bias = []
+    weights = np.array([])
+    bias = np.array([])
     learningRate = 0.1
     inputSize = 0
-    
+
     def __init__(self, inputShape, outputShape, activation=activationFunctions.sigmoid, activationD=activationFunctions.sigmoid) -> None:
         self.inputShape = inputShape
         self.outputShape = outputShape
@@ -21,7 +21,7 @@ class layer:
         self.initBias()
         self.actFunc = activation
         self.actFuncDerivative = activationD
-        
+
     def reinit(self) -> None:
         self.initWeights()
         self.initBias()
