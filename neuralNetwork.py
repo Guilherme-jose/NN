@@ -46,10 +46,15 @@ class NeuralNetwork:
         return outputMatrix
         
     def train(self, inputSet, outputSet, epochs, mode="", testSamples=0, testSet=None, testOutput=None, batchSize=1):
-        iterations = 0
+        self.iterations = 0
+        self.inputSet = inputSet
+        self.outputSet = outputSet
+        self.mode = mode
+        self.testSamples = testSamples
+        
         for epoch in range(epochs):
-            error = 0
-            itError = 0
+            self.batchError = 0
+            self.itError = 0
             for batch in range(len(inputSet) // batchSize):
                 gradient = 0
                 for k in range(batchSize):
@@ -59,28 +64,20 @@ class NeuralNetwork:
                     inputMatrix = np.array(inputSet[j], ndmin=2)
                     
                     outputMatrix = self.guess(inputMatrix)
-                    
-                    gradient += lossFunctions.mse_prime(outputTarget, outputMatrix)
-                    error += lossFunctions.mse(outputTarget, outputMatrix)
-                    itError += lossFunctions.mse(outputTarget, outputMatrix)
+                    gradient += self.updateLoss(outputTarget, outputMatrix)
                         
-                    iterations += 1
-                    if(iterations%1000==0): 
-                        itError /= len(inputSet)
-                        print("iterations:", iterations, "error:", itError)
-                        itError = 0
-                        if(mode == "classifier"):
-                            if(testSet == None):
-                                testSet = inputSet
-                                testOutput = outputSet
-                            self.testClassifier(testSet, testOutput, testSamples)
+                    self.iterations += 1
+                    if(self.iterations%1000==0): 
+                        self.printStats(testSet, testOutput, testSamples)
+                        
                 gradient /= batchSize
                 for i in range(len(self.layerList) - 1):
                     gradient = self.layerList[len(self.layerList) - 1 - i].backPropagation(self.layerList[len(self.layerList)- 2 - i].output, gradient)
                 gradient = self.layerList[0].backPropagation(inputMatrix, gradient)
-            error /= len(inputSet)
-            print("epoch:", epoch, "/",epochs, " -  error:", error)
-            #self.dumpWeights()
+                
+            self.batchError /= len(inputSet)
+            print("epoch:", epoch, "/",epochs, " -  error:", self.batchError)
+            
     
     def testClassifier(self, testSet, testOutput, testSamples=0):
         count = 0
@@ -91,7 +88,7 @@ class NeuralNetwork:
         print(count*100/testSamples, "% " + "over " + str(testSamples) + (" tests"))
 
     def dumpWeights(self):
-        file = open("w/weights" + str(random.randrange(0,999999999)) + ".txt", "w")
+        file = open("w/weights" + self.iterations + ".txt", "w")
         
         with np.printoptions(threshold=np.inf):
             for i in self.layerList:
@@ -116,3 +113,20 @@ class NeuralNetwork:
             i.weights = np.array(w, ndmin=2, dtype=float).T.reshape(i.weights.shape)
             print(i.weights.shape)
             j += 1
+
+    def updateLoss(self, out, pred):
+        self.batchError += lossFunctions.mse(out, pred)
+        self.itError += lossFunctions.mse(out, pred)
+        return lossFunctions.mse_prime(out, pred)
+    
+    def printStats(self, testSet, testOutput, testSamples):
+        self.itError /= 1000
+        print("iterations:", self.iterations, "error:", self.itError)
+        self.itError = 0
+        if(self.mode == "classifier"):
+            if(testSet == None):
+                testSet = self.inputSet
+                testOutput = self.outputSet
+            self.testClassifier(testSet, testOutput, testSamples)
+        #self.dumpWeights()
+        
