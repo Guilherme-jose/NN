@@ -22,8 +22,8 @@ class kernelLayer(layer):
         self.initWeights()
         self.initBias()
     
-    def backPropagation(self, input, output, gradient):
-        gradient = gradient *  self.actFuncDerivative(output)
+    def backPropagation(self, input, gradient):
+        gradient = gradient *  self.actFuncDerivative(self.output)
         kernels_gradient = np.zeros(self.kernelShape)
         input_gradient = np.zeros(self.inputShape)
 
@@ -37,13 +37,13 @@ class kernelLayer(layer):
         return input_gradient
     
     def forward(self, input):
-        output = np.copy(self.bias)
+        self.output = np.copy(self.bias)
         for i in range(self.kernelDepth):
             for j in range(self.inputDepth):
-                output[i] += signal.correlate2d(input[j], self.weights[i, j], "valid")
+                self.output[i] += signal.correlate2d(input[j], self.weights[i, j], "valid")
                 
-        output = self.actFunc(output)
-        return output
+        self.output = self.actFunc(self.output)
+        return self.output
 
     def initWeights(self):
         self.weights = np.random.randn(*self.kernelShape)

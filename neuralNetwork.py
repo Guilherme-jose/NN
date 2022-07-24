@@ -1,7 +1,4 @@
-from imghdr import tests
-import math
 import random
-from tkinter import W
 import numpy as np
 import pygame
 from layers.convolutionLayer import kernelLayer
@@ -10,15 +7,13 @@ from layers.layer import layer
 import lossFunctions
 from layers.maxPoolLayer import maxPoolLayer
 from layers.reshapeLayer import reshapeLayer
-import re
-from ast import literal_eval
 
 class NeuralNetwork:
-    learningRate = 0.2
     layerList = []
     
-    def __init__(self, inputShape):
+    def __init__(self, inputShape, lr=0.2):
         self.inputShape = inputShape
+        self.lr = lr
         
     def reinit(self):
         for i in self.layerList:
@@ -48,11 +43,10 @@ class NeuralNetwork:
         for it in range(len(self.layerList)):
             outputMatrix = self.layerList[it].forward(outputMatrix)
         
-        return outputMatrix.T.tolist()
+        return outputMatrix
         
-    def train(self, inputSet, outputSet, epochs, mode="", testSamples=0, testSet=None, testOutput=None, batchSize=0):
+    def train(self, inputSet, outputSet, epochs, mode="", testSamples=0, testSet=None, testOutput=None, batchSize=1):
         iterations = 0
-        if(batchSize == 0): batchSize = 1
         for epoch in range(epochs):
             error = 0
             itError = 0
@@ -61,19 +55,10 @@ class NeuralNetwork:
                 for k in range(batchSize):
                     j = random.randrange(0, len(outputSet))
                     
-                    outputTarget = np.zeros(self.inputShape)
-                    inputMatrix = np.zeros(self.inputShape)
-                    outputList = []
-
                     outputTarget = np.array(outputSet[j], ndmin=2).T
                     inputMatrix = np.array(inputSet[j], ndmin=2)
                     
-                    outputList.append(inputMatrix)
-                    outputMatrix = inputMatrix
-                    
-                    for it in range(len(self.layerList)):
-                        outputMatrix = self.layerList[it].forward(outputMatrix)
-                        outputList.append(outputMatrix)
+                    outputMatrix = self.guess(inputMatrix)
                     
                     gradient += lossFunctions.mse_prime(outputTarget, outputMatrix)
                     error += lossFunctions.mse(outputTarget, outputMatrix)
@@ -90,11 +75,12 @@ class NeuralNetwork:
                                 testOutput = outputSet
                             self.testClassifier(testSet, testOutput, testSamples)
                 gradient /= batchSize
-                for i in range(len(self.layerList)):
-                        gradient = self.layerList[len(self.layerList) - 1 - i].backPropagation(outputList[len(outputList )- 2 - i], outputList[len(outputList) - 1 - i], gradient)
+                for i in range(len(self.layerList) - 1):
+                    gradient = self.layerList[len(self.layerList) - 1 - i].backPropagation(self.layerList[len(self.layerList)- 2 - i].output, gradient)
+                gradient = self.layerList[0].backPropagation(inputMatrix, gradient)
             error /= len(inputSet)
             print("epoch:", epoch, "/",epochs, " -  error:", error)
-            self.dumpWeights()
+            #self.dumpWeights()
     
     def testClassifier(self, testSet, testOutput, testSamples=0):
         count = 0
@@ -112,7 +98,6 @@ class NeuralNetwork:
                 file.write(str(i.weights))
                 file.write("|\n")
 
-        
     def loadWeights(self, id):
         file = open("w/" + id + ".txt", "r")
         text = file.read()

@@ -14,7 +14,7 @@ trainingOutput = []
 dataset = open("mnist_train_60000.txt")
 imageRes = [28,28]
 
-for i in range(60000):
+for i in range(600):
     input = dataset.readline()
     inputArray = input.split()
     label = inputArray.pop()
@@ -47,7 +47,7 @@ nn.addDenseLayer(128, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 nn.addDenseLayer(10, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 
 
-nn.train(trainingSet, trainingOutput, 300, "classifier",100)
+nn.train(trainingSet, trainingOutput, 30, "classifier",100)
 
 print("finished")
 

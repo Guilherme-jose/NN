@@ -17,17 +17,17 @@ class maxPoolLayer(layer):
     
     #takes input as matrix, for use inside the network
     def forward(self, input): #recheck later
-        output = np.zeros(self.outputShape)
+        self.output = np.zeros(self.outputShape)
         heightOffset = self.inputHeight%self.kernelShape[0]
         widthOffset = self.inputWidth%self.kernelShape[1]
         if heightOffset != 0 or widthOffset != 0:
             input = np.pad(input, ((0,0),(0,heightOffset),(0,widthOffset)))
             
         for i in range(self.inputDepth):
-            output[i] = self.pool2D(input[i])
-        return output
+            self.output[i] = self.pool2D(input[i])
+        return self.output
     
-    def backPropagation(self, input, output, gradient):#SLOOOOOOOW
+    def backPropagation(self, input, gradient):#SLOOOOOOOW
         C = self.inputDepth # number channels
         H = self.inputHeight # height input
         W = self.inputWidth # width input

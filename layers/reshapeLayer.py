@@ -1,4 +1,3 @@
-import random
 import numpy as np
 import activationFunctions
 from layers.layer import layer
@@ -12,10 +11,10 @@ class reshapeLayer(layer):
     def reinit(self) -> None:
         pass
     
-    def backPropagation(self, input, output, error):
-        r = np.reshape(error, self.inputShape)
+    def backPropagation(self, input, gradient):
+        r = np.reshape(gradient, self.inputShape)
         return r
         
     def forward(self, input):
-        output = np.reshape(input, self.outputShape)
-        return output
+        self.output = np.reshape(input, self.outputShape)
+        return self.output
