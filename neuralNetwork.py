@@ -15,6 +15,7 @@ class NeuralNetwork:
     printItCount = 1000
     deltas = []
     deltaBias = []
+    history = []
     
     def __init__(self, inputShape, lr=0.2):
         self.inputShape = inputShape
@@ -91,7 +92,8 @@ class NeuralNetwork:
                 self.initializeDeltas()
                 self.batch()
             self.epoch(epoch)
-            
+        
+        return self.history
     
     def testClassifier(self, testSet, testOutput, testSamples=0):
         count = 0
@@ -161,6 +163,7 @@ class NeuralNetwork:
         if(self.iterations % self.printItCount == 0): 
             self.printStats(self.testSet, self.testOutput, self.testSamples)
             print("iteration Time: ", time() - self.itTime)
+            self.history.append(self.itError)
             self.itError = 0
             self.itTime = time()
             

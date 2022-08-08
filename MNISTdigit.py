@@ -5,6 +5,7 @@ import neuralNetwork as nn
 import activationFunctions
 from lossFunctions import mse
 from lossFunctions import mse_prime
+import matplotlib.pyplot as plt
 
 def by255(x):
     return x/255
@@ -37,7 +38,12 @@ nn.addDenseLayer(10, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 nn.loss = mse
 nn.lossPrime = mse_prime
 
-nn.train(trainingSet, trainingOutput, 3, "classifier",100, batchSize=8)
+history = nn.train(trainingSet, trainingOutput, 1, "classifier",100, batchSize=8)
+
+plt.plot(history)
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('iterations/1000')
+plt.show()
 
 print("finished")
-
