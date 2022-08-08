@@ -14,7 +14,7 @@ trainingOutput = []
 dataset = open("mnist_train_60000.txt")
 imageRes = [28,28]
 
-for i in range(600):
+for i in range(6000):
     input = dataset.readline()
     inputArray = input.split()
     label = inputArray.pop()
@@ -27,27 +27,13 @@ for i in range(600):
 dataset.close()
 
 
-""""
 nn = nn.NeuralNetwork((784,1))
-nn.addReshapeLayer(784, (784,1))
-nn.addDenseLayer(128, activationFunctions.sigmoid, activationFunctions.sigmoidD)
-nn.addDenseLayer(10, activationFunctions.sigmoid, activationFunctions.sigmoidD)
-
-"""
-
-nn = nn.NeuralNetwork((784,1))
-nn.addReshapeLayer((784,1), (784,1))
-#nn.addReshapeLayer((784,1), (1,28,28))
-#nn.addConvLayer((1,28,28), 5, 6)
-#nn.addMaxPoolLayer((6,24,24), (6,12,12))
-#nn.addConvLayer((6,12,12), 5, 16)
-#nn.addMaxPoolLayer((16,8,8), (16,4,4))
-#nn.addReshapeLayer((16,4,4), (256,1))
-nn.addDenseLayer(128, activationFunctions.sigmoid, activationFunctions.sigmoidD)
+nn.addReshapeLayer((784,1))
+nn.addDenseLayer(256, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 nn.addDenseLayer(10, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 
 
-nn.train(trainingSet, trainingOutput, 30, "classifier",100)
+nn.train(trainingSet, trainingOutput, 3, "classifier",100, batchSize=8)
 
 print("finished")
 

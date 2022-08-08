@@ -45,6 +45,7 @@ for i in range(4000, 5000):
     trainingSet.append(data)
     trainingOutput.append([0,1])
 for i in range(100):
+    nn.inputSet=[]
     nn.testClassifier(trainingSet, trainingOutput, 1000)
 print("finished")
 

@@ -18,6 +18,10 @@ def softmax(x):
     x = np.clip( x, -500, 500 )
     return np.exp(x)/sum(np.exp(x))
 
+def softmax(x):
+    x = np.clip( x, -500, 500 )
+    return np.exp(x)/sum(np.exp(x))
+
 def relu(x):
     return np.maximum(0.1*x,x)
 

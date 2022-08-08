@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import activationFunctions
+import weightInit
 
 class layer:
     def activation():
@@ -9,48 +10,39 @@ class layer:
     def activationDerivative():
         pass
     
-    weights = np.array([])
-    bias = np.array([])
-    learningRate = 0.1
+    weights = np.zeros((0,0))
+    bias = np.zeros((0,0))
+    learningRate = 0.02
     inputSize = 0
 
-    def __init__(self, inputShape, outputShape, activation=activationFunctions.sigmoid, activationD=activationFunctions.sigmoid) -> None:
-        self.inputShape = inputShape
-        self.outputShape = outputShape
-        self.initWeights()
-        self.initBias()
-        self.actFunc = activation
-        self.actFuncDerivative = activationD
+    def __init__(self) -> None:
+        pass
 
     def reinit(self) -> None:
-        self.initWeights()
-        self.initBias()
+        pass
     
     #takes input as matrix, for use inside the network
     def forward(self, input):
-        self.output = self.actFunc(   self.weights.T@input + self.bias    )
-        return self.output
+        pass
     
     def backPropagation(self, input, gradient):
-        gradient = gradient * self.actFuncDerivative(self.output)
-        delta = gradient@input.T
-        error = self.weights@gradient
-        self.weights = np.subtract(self.weights, self.learningRate * delta.T)
-        self.bias =  np.subtract(self.bias, self.learningRate * gradient)
-        return error
+        return np.zeros(0)
+    
+    def deltaWeights(self, input, gradient):
+        return np.zeros(0)
+    
+    def deltaBias(self, input, gradient):
+        return np.zeros(0)
+    
+    def updateWeights(self, gradient):
+        pass
+    
+    def updateBias(self, gradient):
+        pass
     
     def initWeights(self):
-        temp = []
-        for i in range(self.inputShape[0]):
-            temp2 = []
-            for j in range(self.outputShape[0]):
-                temp2.append(random.uniform(-1,1))
-            temp.append(temp2)
-        self.weights = np.array(temp, ndmin=2)
+        self.weights = weightInit.normXavier((self.inputShape[0], self.outputShape[0]), self.inputShape[0], self.outputShape[0])
             
     def initBias(self):
-        temp = []
-        for j in range(self.outputShape[0]):
-            temp.append(random.uniform(-1,1))
-        self.bias = np.array(temp, ndmin=2).T
+        self.bias = weightInit.normXavier((self.outputShape), self.inputShape[0], self.outputShape[0])
     

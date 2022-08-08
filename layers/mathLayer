@@ -1,0 +1,18 @@
+import numpy as np
+import activationFunctions
+from layers.layer import layer
+
+class mathLayer(layer):
+    def __init__(self, inputShape, outputShape) -> None:
+        self.inputShape = inputShape
+        self.outputShape = outputShape
+        
+    def reinit(self) -> None:
+        pass
+    
+    def backPropagation(self, input, gradient):
+        return gradient
+
+    def forward(self, input):
+        self.output = input + 1e-8
+        return self.output
