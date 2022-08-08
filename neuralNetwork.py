@@ -12,7 +12,7 @@ from time import time
 
 class NeuralNetwork:
     layerList = []
-    printItCount = 100
+    printItCount = 1000
     deltas = []
     deltaBias = []
     
