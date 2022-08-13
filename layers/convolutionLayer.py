@@ -57,7 +57,7 @@ class kernelLayer(layer):
                 else:
                     kernels_gradient[i, j] = signal.correlate2d(input[j], gradient[i], "valid")
         return kernels_gradient
-    
+
     def updateWeights(self, delta):
         self.weights -= self.learningRate * delta
     
