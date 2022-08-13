@@ -15,7 +15,7 @@ class NeuralNetwork:
     printItCount = 1000
     deltas = []
     deltaBias = []
-    history = []
+    history = {}
     
     def __init__(self, inputShape, lr=0.2):
         self.inputShape = inputShape
@@ -23,6 +23,8 @@ class NeuralNetwork:
         self.loss = lossFunctions.binary_cross_entropy
         self.lossPrime = lossFunctions.binary_cross_entropy_prime
         self.initializeDeltas()
+        self.history['loss'] = []
+        self.history['accuracy'] = []
         
     def reinit(self):
         for i in self.layerList:
@@ -87,6 +89,8 @@ class NeuralNetwork:
                     lossGradient = self.updateLoss(outputTarget, outputMatrix)
                     self.updateGradient(lossGradient, inputMatrix)
                     self.iteration()
+                self.deltas = [k/batchSize for k in self.deltas]
+                self.deltaBias = [k/batchSize for k in self.deltaBias]
                 self.updateWeights(self.deltas)
                 self.updateBias(self.deltaBias)
                 self.initializeDeltas()
@@ -102,6 +106,7 @@ class NeuralNetwork:
             if(np.argmax(self.guess(testSet[j])) == np.argmax(testOutput[j]).T):
                 count += 1
         print(count*100/testSamples, "% " + "over " + str(testSamples) + (" tests using test set"))
+        self.history['accuracy'].append(count*100/testSamples)
         count = 0
         for i in range(min(testSamples, len(self.inputSet))): 
             j = random.randrange(len(self.inputSet))
@@ -163,7 +168,7 @@ class NeuralNetwork:
         if(self.iterations % self.printItCount == 0): 
             self.printStats(self.testSet, self.testOutput, self.testSamples)
             print("iteration Time: ", time() - self.itTime)
-            self.history.append(self.itError)
+            self.history['loss'].append(self.itError)
             self.itError = 0
             self.itTime = time()
             
@@ -182,7 +187,7 @@ class NeuralNetwork:
             self.deltas[layerCount - 1  - i] += self.layerList[len(self.layerList) - 1 - i].deltaWeights(self.layerList[layerCount - 2 - i].output, gradient)
             if(self.deltaBias[layerCount - 1  - i].size != 0):
                 self.deltaBias[layerCount - 1  - i] += gradient
-            gradient = self.layerList[layerCount - 1 - i].backPropagation(self.layerList[layerCount - 1 - i].output, gradient)
+            gradient = self.layerList[layerCount - 1 - i].backPropagation(self.layerList[layerCount - 2 - i].output, gradient)
         self.deltas[0] += self.layerList[0].deltaWeights(inputMatrix, gradient)
         if(self.deltaBias[0].size != 0):
             self.deltaBias[0] += gradient

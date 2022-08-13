@@ -66,8 +66,8 @@ def solveCenter(nn):
         
     print("--------------------")
 
-    for i in range(20):
-        nn.train(input, output, 20)
+    for i in range(100):
+        nn.train(input, output, 2)
         showSpace(40)
       
     for i in input:          
@@ -89,12 +89,13 @@ nn.loss = mse
 nn.addReshapeLayer((2,1))
 nn.addDenseLayer(20, activationFunctions.leakyRelu, activationFunctions.leakyReluD)
 nn.addDenseLayer(1, activationFunctions.leakyRelu, activationFunctions.leakyReluD)
-#solveXOR(nn) 
-solveCenter(nn)
+
+routine = solveCenter
+routine(nn)
     
 
 while(True):
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
-        if event.type == pygame.KEYDOWN: solveXOR(nn)
+        if event.type == pygame.KEYDOWN: routine(nn)
     pygame.display.flip()

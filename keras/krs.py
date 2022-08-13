@@ -69,8 +69,6 @@ testOutput = np.array(testOutput, ndmin=2)
 # Criando o modelo
 model = Sequential()
 model.add(Conv2D(filters=32, kernel_size= (5, 5), input_shape=(3, 64, 64), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Conv2D(filters=52, kernel_size= (5, 5), input_shape=(32, 32, 32), padding='same', activation='relu'))
 #model.add(Conv2D(filters=72, kernel_size= (3, 3), input_shape=(52, 32, 32), padding='same', activation='relu'))
 model.add(Flatten())
 model.add(Dense(256,kernel_regularizer=L2(), activation='relu'))

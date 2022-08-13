@@ -38,11 +38,17 @@ nn.addDenseLayer(10, activationFunctions.sigmoid, activationFunctions.sigmoidD)
 nn.loss = mse
 nn.lossPrime = mse_prime
 
-history = nn.train(trainingSet, trainingOutput, 1, "classifier",100, batchSize=8)
+history = nn.train(trainingSet, trainingOutput, 10, "classifier",1000, batchSize=16)
 
-plt.plot(history)
+plt.plot(history['loss'])
 plt.title('model loss')
 plt.ylabel('loss')
+plt.xlabel('iterations/1000')
+plt.show()
+
+plt.plot(history['accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
 plt.xlabel('iterations/1000')
 plt.show()
 
